@@ -459,7 +459,7 @@ namespace Ookii.Dialogs.Wpf
         /// <exception cref="CredentialException">An error occurred while showing the credentials dialog.</exception>
         /// <exception cref="InvalidOperationException"><see cref="Target"/> is an empty string ("").</exception>
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-        public bool ShowDialog(IntPtr owner)
+        public virtual bool ShowDialog(IntPtr owner)
         {
             if (string.IsNullOrEmpty(_target))
                 throw new InvalidOperationException(Properties.Resources.CredentialEmptyTargetError);
@@ -490,6 +490,8 @@ namespace Ookii.Dialogs.Wpf
                 storedCredentials = true;
             }
 
+            DialogShowing?.Invoke(this, EventArgs.Empty);
+
             bool result;
             if (NativeMethods.IsWindowsVistaOrLater)
                 result = PromptForCredentialsCredUIWin(ownerHandle, storedCredentials);
@@ -497,6 +499,11 @@ namespace Ookii.Dialogs.Wpf
                 result = PromptForCredentialsCredUI(ownerHandle, storedCredentials);
             return result;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event EventHandler DialogShowing;
 
         /// <summary>
         /// Shows the credentials dialog as a modal dialog with the specified owner.
@@ -828,8 +835,17 @@ namespace Ookii.Dialogs.Wpf
             }
         }
 
-        private unsafe bool PromptForCredentialsCredUIWin(HWND owner, bool storedCredentials)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ownerHnd"></param>
+        /// <param name="storedCredentials"></param>
+        /// <returns></returns>
+        /// <exception cref="CredentialException"></exception>
+        protected unsafe bool PromptForCredentialsCredUIWin(IntPtr ownerHnd, bool storedCredentials)
         {
+            HWND owner = (HWND)ownerHnd; 
+
             CREDUI_INFOW info = CreateCredUIInfo(owner, false);
             CREDUIWIN_FLAGS flags = CREDUIWIN_FLAGS.CREDUIWIN_GENERIC;
             if (ShowSaveCheckBox)
