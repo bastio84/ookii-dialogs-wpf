@@ -342,6 +342,12 @@ namespace Ookii.Dialogs.Wpf
         public bool ShowSaveCheckBox { get; set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        [Category("Appearance"), Description("Indicates whether the username is read-only."), DefaultValue(false)]
+        public bool IsUserNameReadOnly { get; set; }
+
+        /// <summary>
         /// Gets or sets a value that indicates whether the dialog should be displayed even when saved credentials exist for the 
         /// specified target.
         /// </summary>
@@ -850,6 +856,8 @@ namespace Ookii.Dialogs.Wpf
             CREDUIWIN_FLAGS flags = CREDUIWIN_FLAGS.CREDUIWIN_GENERIC;
             if (ShowSaveCheckBox)
                 flags |= CREDUIWIN_FLAGS.CREDUIWIN_CHECKBOX;
+            if(IsUserNameReadOnly)
+                flags |= CREDUIWIN_FLAGS.CREDUIWIN_IN_CRED_ONLY;
 
             IntPtr inBuffer = IntPtr.Zero;
             IntPtr outBuffer = IntPtr.Zero;
